@@ -1,5 +1,5 @@
 import datetime
-import pyspeedtest
+import speedtest
 
 # Formatting function
 # taken from https://github.com/jputman-testing/python-speedtest-with-tweet-functionality
@@ -11,23 +11,21 @@ def FormatSpeed(speed):
         unit += 1
     return '%0.3f %s' % (speed, units[unit])
 
-print('starting speed test\n')
-speed = pyspeedtest.SpeedTest()
-print('running ping test . . .')
-ping = speed.ping()
-print('running download test . . .')
-download = speed.download()
-print('running upload test . . .')
-upload = speed.upload()
+print('Running speed test . . .')
+time = datetime.datetime.now()
+speed = speedtest.Speedtest()
+speed.get_best_server()
+speed.download()
+speed.upload()
 
-formattedDown = FormatSpeed(download)
-formattedUp = FormatSpeed(upload)
+formattedDown = FormatSpeed(speed.results.download)
+formattedUp = FormatSpeed(speed.results.upload)
 
-print('\nDownload: %s\nUpload: %s\nPing: %0.0f\n' % (formattedDown, formattedUp, ping))
+print('Download: %s\nUpload: %s\nPing: %0.0f' % (formattedDown, formattedUp, speed.results.ping))
 
-print('Outputting results to log . . .\n')
+print('Outputting results to log . . .')
 file = open("speed-log.csv", "a+")
-file.write('%s,%0.0f,%s,%s\n' % (datetime.datetime.now(), ping, download, upload))
+file.write('%s,%0.0f,%s,%s\n' % (time, speed.results.ping, speed.results.download, speed.results.upload))
 file.close()
 
 print('Done!')
